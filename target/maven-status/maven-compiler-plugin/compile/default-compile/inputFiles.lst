@@ -1,2 +1,4 @@
-/home/vukasin/SK/localstorage/src/main/java/model/LocalDir.java
+/home/vukasin/SK/localstorage/src/main/java/service/Dir.java
+/home/vukasin/SK/localstorage/src/main/java/db/LocalBase.java
+/home/vukasin/SK/localstorage/src/main/java/service/Fajl.java
 /home/vukasin/SK/localstorage/src/main/java/app/Main.java

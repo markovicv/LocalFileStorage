@@ -1,2 +1,4 @@
+db/LocalBase.class
+service/Fajl.class
 app/Main.class
-model/LocalDir.class
+service/Dir.class

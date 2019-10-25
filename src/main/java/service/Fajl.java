@@ -1,6 +1,8 @@
-package model;
+package service;
 
 import exception.*;
+import model.FileOrdinary;
+import model.Zipper;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -12,18 +14,19 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 
-public class LocalFile implements FileOrdinary {
+public class Fajl implements FileOrdinary {
     Path path;
 
-    public LocalFile(Path path){
+    public Fajl(Path path){
         this.path = path;
     }
-    public LocalFile(){
+    public Fajl(){
 
     }
 
     @Override
     public void create(String path, String name) throws CreateFileException {
+
         Path filePath = null;
         if(path!= null && path.length()>0)
             filePath = Paths.get(path);
@@ -34,6 +37,7 @@ public class LocalFile implements FileOrdinary {
         if(Files.exists(filePath) && Files.exists(p)==false){
             try{
                 Files.createFile(p);
+
                 System.out.println("Uspesno kreiran fajl");
             }
             catch(Exception e){
@@ -48,6 +52,7 @@ public class LocalFile implements FileOrdinary {
 
     @Override
     public void delete(String pathName) throws DeleteFileException {
+
         if(pathName==null || pathName.equals(""))
             throw new DeleteFileException("path name is empty");
         Path filePath = Paths.get(pathName);
@@ -89,6 +94,7 @@ public class LocalFile implements FileOrdinary {
 
     @Override
     public void rename(String path, String newName) throws RenameException {
+
         if(newName==null || newName.equals(""))
             throw new RenameException("name is empty");
         if(path==null || path.equals(""))
@@ -108,6 +114,11 @@ public class LocalFile implements FileOrdinary {
         }
         else
             throw new RenameException("File doesnt exist");
+
+    }
+
+    @Override
+    public void upload(String srcPath, String dstPath) throws UploadFileException {
 
     }
 
@@ -141,17 +152,60 @@ public class LocalFile implements FileOrdinary {
     }
 
     @Override
-    public void uploadZip(String s, String s1, String s2) throws CopyFileException {
+    public void uploadZip(File file, String dstPath) throws UploadFileException {
+        if(dstPath==null || dstPath.equals(""))
+            throw new UploadFileException("destination path is empty");
+        if(!file.exists())
+            throw new UploadFileException("file does not exist");
+        Path dPath = Paths.get(dstPath);
+        Zipper zipper = new Zipper();
+        if(Files.exists(dPath)){
+            zipper.zipFile(file,dstPath,file.getName().substring(0, file.getName().lastIndexOf('.')));
+        }
+        else
+            throw new UploadFileException("unable to zip a file");
+
 
     }
 
     @Override
-    public void uploadMultipleFile(List<File> list, String s) throws UploadMultipleFileException {
-
+    public void uploadMultipleFile(List<File> files, String dstPath) throws UploadMultipleFileException {
+        if(files==null || files.size()==0)
+            throw new UploadMultipleFileException("list of files are empty");
+        if(dstPath==null || dstPath.equals(""))
+            throw new UploadMultipleFileException("path is empty");
+        Path dPath = Paths.get(dstPath);
+        if(Files.exists(dPath)){
+            for(File f:files){
+                try {
+                    Path p = Paths.get(dstPath + File.separator + f.getName());
+                    Files.copy(Paths.get(f.getAbsolutePath()), p, StandardCopyOption.REPLACE_EXISTING);
+                }
+                catch(Exception e){
+                    IOException exception = (IOException)e;
+                    exception.printStackTrace();
+                }
+            }
+        }
+        else
+            throw new UploadMultipleFileException("could upload files");
     }
 
     @Override
-    public void uploadListToZip(List<File> list, String s, String s1) throws UploadMultipleFileException {
-
+    public void uploadMultipleFilesToZipFiles(List<File> files, String dstPath) throws UploadMultipleFileException {
+        if(files==null || files.size()==0)
+            throw new UploadMultipleFileException("list of files are empty");
+        if(dstPath==null || dstPath.equals(""))
+            throw new UploadMultipleFileException("path is emmty");
+        Path dPath = Paths.get(dstPath);
+        Zipper zipper = new Zipper();
+        if(Files.exists(dPath)){
+            for(File f:files){
+                System.out.println("AAAAAAAAA");
+                zipper.zipFile(f,dstPath,f.getName().substring(0, f.getName().lastIndexOf('.')));
+            }
+        }
+        else
+            throw new UploadMultipleFileException("Couldnt zip files");
     }
 }

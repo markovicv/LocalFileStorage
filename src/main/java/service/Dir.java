@@ -1,6 +1,8 @@
-package model;
+package service;
 
 import exception.*;
+import model.Directory;
+import model.Zipper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
@@ -18,15 +20,15 @@ import java.util.List;
 
 import java.io.File;
 
-public class LocalDir implements Directory{
+public class Dir implements Directory {
 
-    private Path dirPath;
+    private String dirPath;
 
-    public LocalDir(Path path){
+    public Dir(String path){
         this.dirPath = path;
 
     }
-    public LocalDir(){
+    public Dir(){
 
     }
 
@@ -102,12 +104,15 @@ public class LocalDir implements Directory{
             throw new ZipException("Directory is empty");
         if(path==null || path.equals(""))
             throw new ZipException("Path is empty");
+        if(!(new File(dir.getAbsolutePath()).isDirectory()))
+            throw new ZipException("Not a dir!");
         Path dirPath = Paths.get(path);
         if(!Files.exists(dirPath))
             throw new ZipException("Not a dir!");
         else{
             Zipper zipper = new Zipper();
             zipper.zipDir(dir,dirPath.toString(),zipName);
+            System.out.println("dir zipped!");
         }
     }
 
@@ -117,6 +122,9 @@ public class LocalDir implements Directory{
         if(pathName==null || pathName.length()==0)
             throw new DeleteDirException("path name is empty");
         Path dirPath = Paths.get(pathName);
+        if(!(new File(pathName).isDirectory())){
+            throw new DeleteDirException("Not a dir!!");
+        }
 
         if(Files.exists(dirPath)){
             try{
@@ -140,6 +148,8 @@ public class LocalDir implements Directory{
             throw new MoveDirException("source path invalid");
         if(dstPath==null || dstPath.equals(""))
             throw  new MoveDirException("destination path invalid");
+        if(!(new File(srcPath).isDirectory()))
+            throw new MoveDirException("Not a dir");
         Path sourceP = Paths.get(srcPath);
         Path destinationP = Paths.get(dstPath);
         if(Files.exists(sourceP) && Files.exists(destinationP)){
@@ -249,4 +259,11 @@ public class LocalDir implements Directory{
     }
 
 
+    public void setPath(String path){
+        this.dirPath = path;
+
+    }
+    public String getPath(){
+        return dirPath;
+    }
 }
